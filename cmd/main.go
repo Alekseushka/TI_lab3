@@ -56,13 +56,13 @@ func cryptHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reg, err := lfsr.New(req.Seed)
+	reg, err := algo.New(req.Seed)
 	if err != nil {
 		writeErr(w, err.Error())
 		return
 	}
 
-	inputFiltered := lfsr.FilterBits(req.InputBits)
+	inputFiltered := algo.FilterBits(req.InputBits)
 	if len(inputFiltered) == 0 {
 		writeErr(w, "нет входных данных (нет битов 0/1)")
 		return
@@ -115,7 +115,7 @@ func fileToBitsHandler(w http.ResponseWriter, r *http.Request) {
 		writeErrGeneric(w, "некорректные данные файла")
 		return
 	}
-	bits := lfsr.BytesToBits(data)
+	bits := algo.BytesToBits(data)
 	json.NewEncoder(w).Encode(fileToBitsResponse{Bits: bits, Count: len(bits)})
 }
 
@@ -147,12 +147,12 @@ func bitsToFileHandler(w http.ResponseWriter, r *http.Request) {
 		writeErrGeneric(w, "некорректный JSON")
 		return
 	}
-	bits := lfsr.FilterBits(req.Bits)
+	bits := algo.FilterBits(req.Bits)
 	if len(bits)%8 != 0 {
 		writeErrGeneric(w, "длина бит не кратна 8 — невозможно сохранить как байты")
 		return
 	}
-	data, err := lfsr.BitsToBytes(bits)
+	data, err := algo.BitsToBytes(bits)
 	if err != nil {
 		writeErrGeneric(w, err.Error())
 		return
